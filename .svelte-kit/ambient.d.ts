@@ -21,7 +21,7 @@
  * 
  * You can override `.env` values from the command line like so:
  * 
- * ```sh
+ * ```bash
  * MY_FEATURE_FLAG="enabled" npm run dev
  * ```
  */
@@ -30,14 +30,12 @@ declare module '$env/static/private' {
 	export const DATABASE_AUTH_TOKEN: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
-	export const COLOR: string;
 	export const COLORTERM: string;
 	export const CommonProgramFiles: string;
 	export const CommonProgramW6432: string;
 	export const COMPUTERNAME: string;
 	export const ComSpec: string;
 	export const DriverData: string;
-	export const EDITOR: string;
 	export const EFC_8560_1592913036: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
@@ -48,21 +46,14 @@ declare module '$env/static/private' {
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
 	export const NODE: string;
-	export const NODE_EXE: string;
-	export const NPM_CLI_JS: string;
+	export const NODE_PATH: string;
 	export const npm_command: string;
-	export const npm_config_cache: string;
 	export const npm_config_engine_strict: string;
-	export const npm_config_globalconfig: string;
-	export const npm_config_global_prefix: string;
-	export const npm_config_init_module: string;
-	export const npm_config_local_prefix: string;
-	export const npm_config_node_gyp: string;
-	export const npm_config_noproxy: string;
-	export const npm_config_npm_version: string;
-	export const npm_config_prefix: string;
-	export const npm_config_userconfig: string;
+	export const npm_config_frozen_lockfile: string;
+	export const npm_config_registry: string;
 	export const npm_config_user_agent: string;
+	export const npm_config_verify_deps_before_run: string;
+	export const npm_config__jsr_registry: string;
 	export const npm_execpath: string;
 	export const npm_lifecycle_event: string;
 	export const npm_lifecycle_script: string;
@@ -70,15 +61,15 @@ declare module '$env/static/private' {
 	export const npm_package_json: string;
 	export const npm_package_name: string;
 	export const npm_package_version: string;
-	export const NPM_PREFIX_JS: string;
-	export const NPM_PREFIX_NPM_CLI_JS: string;
 	export const NUMBER_OF_PROCESSORS: string;
 	export const OneDrive: string;
 	export const ORIGINAL_XDG_CURRENT_DESKTOP: string;
 	export const OS: string;
 	export const Path: string;
 	export const PATHEXT: string;
+	export const pnpm_config_verify_deps_before_run: string;
 	export const PNPM_HOME: string;
+	export const PNPM_SCRIPT_SRC_DIR: string;
 	export const PROCESSOR_ARCHITECTURE: string;
 	export const PROCESSOR_IDENTIFIER: string;
 	export const PROCESSOR_LEVEL: string;
@@ -129,12 +120,14 @@ declare module '$env/static/public' {
  * 
  * This module cannot be imported into client-side code.
  * 
+ * Dynamic environment variables cannot be used during prerendering.
+ * 
  * ```ts
  * import { env } from '$env/dynamic/private';
  * console.log(env.DEPLOYMENT_SPECIFIC_VARIABLE);
  * ```
  * 
- * > [!NOTE] In `dev`, `$env/dynamic` always includes environment variables from `.env`. In `prod`, this behavior will depend on your adapter.
+ * > In `dev`, `$env/dynamic` always includes environment variables from `.env`. In `prod`, this behavior will depend on your adapter.
  */
 declare module '$env/dynamic/private' {
 	export const env: {
@@ -142,14 +135,12 @@ declare module '$env/dynamic/private' {
 		DATABASE_AUTH_TOKEN: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
-		COLOR: string;
 		COLORTERM: string;
 		CommonProgramFiles: string;
 		CommonProgramW6432: string;
 		COMPUTERNAME: string;
 		ComSpec: string;
 		DriverData: string;
-		EDITOR: string;
 		EFC_8560_1592913036: string;
 		GIT_ASKPASS: string;
 		HOME: string;
@@ -160,21 +151,14 @@ declare module '$env/dynamic/private' {
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
 		NODE: string;
-		NODE_EXE: string;
-		NPM_CLI_JS: string;
+		NODE_PATH: string;
 		npm_command: string;
-		npm_config_cache: string;
 		npm_config_engine_strict: string;
-		npm_config_globalconfig: string;
-		npm_config_global_prefix: string;
-		npm_config_init_module: string;
-		npm_config_local_prefix: string;
-		npm_config_node_gyp: string;
-		npm_config_noproxy: string;
-		npm_config_npm_version: string;
-		npm_config_prefix: string;
-		npm_config_userconfig: string;
+		npm_config_frozen_lockfile: string;
+		npm_config_registry: string;
 		npm_config_user_agent: string;
+		npm_config_verify_deps_before_run: string;
+		npm_config__jsr_registry: string;
 		npm_execpath: string;
 		npm_lifecycle_event: string;
 		npm_lifecycle_script: string;
@@ -182,15 +166,15 @@ declare module '$env/dynamic/private' {
 		npm_package_json: string;
 		npm_package_name: string;
 		npm_package_version: string;
-		NPM_PREFIX_JS: string;
-		NPM_PREFIX_NPM_CLI_JS: string;
 		NUMBER_OF_PROCESSORS: string;
 		OneDrive: string;
 		ORIGINAL_XDG_CURRENT_DESKTOP: string;
 		OS: string;
 		Path: string;
 		PATHEXT: string;
+		pnpm_config_verify_deps_before_run: string;
 		PNPM_HOME: string;
+		PNPM_SCRIPT_SRC_DIR: string;
 		PROCESSOR_ARCHITECTURE: string;
 		PROCESSOR_IDENTIFIER: string;
 		PROCESSOR_LEVEL: string;
@@ -230,6 +214,8 @@ declare module '$env/dynamic/private' {
  * Similar to [`$env/dynamic/private`](https://svelte.dev/docs/kit/$env-dynamic-private), but only includes variables that begin with [`config.kit.env.publicPrefix`](https://svelte.dev/docs/kit/configuration#env) (which defaults to `PUBLIC_`), and can therefore safely be exposed to client-side code.
  * 
  * Note that public dynamic environment variables must all be sent from the server to the client, causing larger network requests — when possible, use `$env/static/public` instead.
+ * 
+ * Dynamic environment variables cannot be used during prerendering.
  * 
  * ```ts
  * import { env } from '$env/dynamic/public';
