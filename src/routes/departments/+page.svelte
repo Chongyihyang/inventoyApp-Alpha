@@ -77,7 +77,6 @@
         deleteIsOpen = true;
     }
     
-    console.log(selecteditems)
         
 </script>
 
