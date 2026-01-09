@@ -1,0 +1,7 @@
+db/
+wishlist.txt
+test.txt
+local.db
+.codebuddy/
+.vscode/
+node_modules/

@@ -1,0 +1,43 @@
+{
+	"/": [
+		"src/routes/+page.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/category": [
+		"src/routes/category/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/departments": [
+		"src/routes/departments/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/inout/[[date]]": [
+		"src/routes/inout/[[date]]/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/items": [
+		"src/routes/items/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/login": [
+		"src/routes/login/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/logs/[[date]]": [
+		"src/routes/logs/[[date]]/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/stocktake": [
+		"src/routes/stocktake/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/stocktake/history": [
+		"src/routes/stocktake/history/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/users": [
+		"src/routes/users/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	]
+}

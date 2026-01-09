@@ -1,0 +1,195 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@layer components {
+    body {
+        @apply bg-gray-950 text-gray-200;
+    }
+
+    /* navbar */
+    nav {
+        @apply dark:bg-gray-800;
+    }
+
+    .dropdown{
+        @apply float-left overflow-hidden
+    }
+
+    .dropdown-content {
+        @apply hidden absolute bg-gray-800 min-w-[160px] z-10
+    }
+
+    .dropdown-content a {
+        @apply float-none px-3 py-4 decoration-0 block left-0
+    }
+
+    .dropdown:hover .dropdown-content {
+        @apply block
+    }
+
+    /* ul {
+        @apply dark:bg-gray-700 flex;
+    }
+
+    li {
+        @apply m-3 dark:bg-gray-700;
+    }
+
+    li>a {
+        @apply align-middle;
+    } */
+
+    a:hover {
+        @apply text-gray-500;
+    }
+
+    select {
+        @apply py-[3px] dark:bg-gray-800 border-0 rounded-2xl;
+    }
+
+    .signout {
+        @apply text-[14px] py-[5px];
+    }
+
+    /* button settings */
+    button {
+        @apply bg-blue-700 text-gray-100 items-center gap-2 px-4 py-2.5 m-1 rounded-2xl font-medium cursor-pointer transition-all duration-200 border-0 decoration-0  text-center hover:bg-blue-900 hover:text-gray-50 max-sm:px-2 ;
+    }
+
+    /* table settings */
+
+    table {
+        @apply mx-auto my-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400;
+    }
+
+    thead {
+        @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400;
+    }
+
+    tbody {
+        @apply bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200;
+    }
+
+    th {
+        @apply px-6 py-4 bg-[#364153] max-sm:px-2 top-0 z-[2] sticky;
+    }
+
+    td {
+        @apply px-6 py-4 text-left max-sm:px-2;
+    }
+
+    .hover:hover {
+        @apply bg-gray-500 text-gray-50;
+    }
+
+    /* dialog settings */
+    dialog {
+        @apply w-[60vw] min-w-[40vw] rounded-sm p-0 mx-auto my-auto bg-gray-950 text-gray-200 border-2 max-sm:w-full;
+    }
+
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    dialog[open] {
+        animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes zoom {
+        from {
+            transform: scale(0.95);
+        }
+
+        to {
+            transform: scale(1);
+        }
+    }
+
+    dialog[open]::backdrop {
+        animation: fade 0.2s ease-out;
+    }
+
+    @keyframes fade {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .title {
+        @apply text-white font-bold text-[20px] border-b-[1px] border-[#eee] pb-[5px] mb-3 w-fit mx-auto h-5 m-5 text-3xl;
+    }
+
+    .form-group {
+        @apply px-3 py-1 w-full mb-2;
+    }
+
+    .form-group>label,
+    dialog>label,
+    .combobox-label {
+        @apply font-bold text-[16px] block mb-2;
+    }
+
+    .required {
+        @apply text-[#e32] ml-[2px]
+    }
+
+    .box {
+        @apply h-10 col-span-2 dark:bg-gray-800 rounded-2xl;
+    }
+
+    .submit {
+        @apply font-bold col-span-3 dark:bg-gray-500 rounded-2xl p-3;
+    }
+
+    .submit:hover {
+        @apply dark:bg-gray-700;
+    }
+
+    .internal {
+        @apply px-10 py-5 mx-auto max-h-[90vh] w-full overflow-y-auto max-sm:px-4;
+    }
+
+    dialog::-webkit-scrollbar {
+        display: none;
+    }
+
+    .text {
+        @apply w-full rounded-2xl dark:bg-gray-800 mt-2 h-10;
+    }
+
+    .sloc {
+        @apply w-4 rounded-2xl ml-4 mt-1;
+    }
+
+    #itemList {
+        @apply border-2 border-solid  p-2.5 h-35 mt-3 overflow-y-auto;
+    }
+
+    .button-normal {
+        @apply text-white border-0  rounded-2xl cursor-pointer text-2xl w-full mb-3;
+    }
+
+    .close {
+        @apply bg-red-700 text-white border-0  rounded-2xl text-2xl mr-2 w-full;
+    }
+
+    .close:hover {
+        @apply bg-red-500 text-white border-0  rounded-2xl cursor-pointer text-2xl mr-2 w-full;
+    }
+
+    .combobox-container {
+        @apply relative
+    }
+
+    .combobox-wrapper {
+        @apply relative
+    }
+
+    .combobox-arrow {
+        @apply absolute right-[1rem] top-[60%] translate-y-[-50%] cursor-pointer text-[#666] pointer-events-none
+    }
+}

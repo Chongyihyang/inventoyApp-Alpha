@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Item Transfer Form Generator</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Item Transfer Form</h1>
+    
+    <!-- Input form -->
+    <div id="inputForm">
+        <div>
+            <label>From Department:</label>
+            <input type="text" id="fromDept">
+        </div>
+        <div>
+            <label>To Department:</label>
+            <input type="text" id="toDept">
+        </div>
+        
+        <table id="itemTable">
+            <thead><tr><th>Item</th><th>Qty</th><th></th></tr></thead>
+            <tbody id="items"></tbody>
+        </table>
+        
+        <button onclick="addItem()">Add Item</button>
+        <button onclick="generateForm()">Generate Transfer Form</button>
+    </div>
+
+    <!-- Output form -->
+    <div id="outputForm" class="hidden">
+        <h2>DEPARTMENT TRANSFER FORM</h2>
+        <p>Date: <span id="formDate"></span></p>
+        <p>From: <span id="formFromDept"></span></p>
+        <p>To: <span id="formToDept"></span></p>
+
+        <table id="transferItems">
+            <!-- Items will be inserted here -->
+        </table>
+
+        <button onclick="window.print()">Print Form</button>
+    </div>
+
+    <script>
+        function addItem() {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="itemName"></td>
+                <td><input type="number" class="itemQty"></td>
+                <td><button onclick="this.parentElement.parentElement.remove()">Remove</button></td>`;
+            document.getElementById('items').appendChild(row);
+        }
+
+        function generateForm() {
+            // Set header info
+            document.getElementById('formDate').textContent = new Date().toLocaleDateString();
+            document.getElementById('formFromDept').textContent = document.getElementById('fromDept').value;
+            document.getElementById('formToDept').textContent = document.getElementById('toDept').value;
+
+            // Build items table
+            const itemsTable = document.getElementById('transferItems');
+            itemsTable.innerHTML = '<tr><th>Item</th><th>Quantity</th></tr>';
+            
+            const rows = document.querySelectorAll('#items tr');
+            rows.forEach(row => {
+                const name = row.querySelector('.itemName').value;
+                const qty = row.querySelector('.itemQty').value;
+                
+                if(name && qty) {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `<td>${name}</td><td>${qty}</td>`;
+                    itemsTable.appendChild(newRow);
+                }
+            });
+
+            // Show the output form
+            document.getElementById('inputForm').classList.add('hidden');
+            document.getElementById('outputForm').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
