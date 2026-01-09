@@ -5,3 +5,4 @@ local.db
 .codebuddy/
 .vscode/
 node_modules/
+.env
