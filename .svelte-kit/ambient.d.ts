@@ -36,7 +36,13 @@ declare module '$env/static/private' {
 	export const COMPUTERNAME: string;
 	export const ComSpec: string;
 	export const DriverData: string;
-	export const EFC_8560_1592913036: string;
+	export const EFC_10004_1262719628: string;
+	export const EFC_10004_1592913036: string;
+	export const EFC_10004_2283032206: string;
+	export const EFC_10004_2775293581: string;
+	export const EFC_10004_3789132940: string;
+	export const FPS_BROWSER_APP_PROFILE_STRING: string;
+	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -46,6 +52,7 @@ declare module '$env/static/private' {
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
 	export const NODE: string;
+	export const NODE_ENV: string;
 	export const NODE_PATH: string;
 	export const npm_command: string;
 	export const npm_config_engine_strict: string;
@@ -141,7 +148,13 @@ declare module '$env/dynamic/private' {
 		COMPUTERNAME: string;
 		ComSpec: string;
 		DriverData: string;
-		EFC_8560_1592913036: string;
+		EFC_10004_1262719628: string;
+		EFC_10004_1592913036: string;
+		EFC_10004_2283032206: string;
+		EFC_10004_2775293581: string;
+		EFC_10004_3789132940: string;
+		FPS_BROWSER_APP_PROFILE_STRING: string;
+		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;
@@ -151,6 +164,7 @@ declare module '$env/dynamic/private' {
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
 		NODE: string;
+		NODE_ENV: string;
 		NODE_PATH: string;
 		npm_command: string;
 		npm_config_engine_strict: string;

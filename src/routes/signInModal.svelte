@@ -1,7 +1,4 @@
 <script lang="ts">
-	import Dropdown from "$lib/dropdown.svelte";
-	import { enhanceFormSubmission } from "$lib/client/network";
-	import { onMount } from 'svelte';
 	import { browser } from '$app/environment'
 		// Type declaration
 		type item = {
@@ -37,59 +34,6 @@
 	let formElement: HTMLFormElement
 	let dialog: HTMLDialogElement // HTMLDialogElement
 	let { signInModalOpen = $bindable(), data, form } = $props()
-	
-	// Initialize network resilience on mount
-	onMount(() => {
-		if (formElement) {
-			enhanceFormSubmission(formElement);
-		}
-		
-		// Add global keyboard listener for fast typing detection
-		const handleGlobalKeydown = (e: KeyboardEvent) => {
-			if (!signInModalOpen) return;
-			
-			const currentTime = Date.now();
-			
-			// Detect fast typing (barcode scanner typically types very fast)
-			if (currentTime - lastKeyTime < FAST_TYPING_THRESHOLD) {
-				keySequence += e.key;
-				clearTimeout(fastTypingTimeout);
-				
-				// If we have a fast sequence, focus on barcode input
-				if (keySequence.length >= MIN_SEQUENCE_LENGTH) {
-					const barcodeInput = document.getElementById("barcodeInput") as HTMLInputElement;
-					if (barcodeInput && document.activeElement !== barcodeInput) {
-						e.preventDefault();
-						barcodeInput.focus();
-						showStatus('Fast typing detected - activated barcode mode', true);
-					}
-				}
-				
-				// Reset fast typing detection after delay
-				fastTypingTimeout = setTimeout(() => {
-					keySequence = '';
-				}, 500);
-			} else {
-				// Reset sequence if typing is slow
-				keySequence = '';
-			}
-			
-			lastKeyTime = currentTime;
-		};
-		
-		document.addEventListener('keydown', handleGlobalKeydown);
-		
-		return () => {
-			document.removeEventListener('keydown', handleGlobalKeydown);
-		};
-	});
-	
-	// Fast typing detection for barcode scanner
-	let lastKeyTime = 0;
-	let keySequence = '';
-	let fastTypingTimeout: NodeJS.Timeout;
-	const FAST_TYPING_THRESHOLD = 100; // ms between keys to consider it "fast typing"
-	const MIN_SEQUENCE_LENGTH = 3; // minimum keys to trigger barcode mode
 	let itemList: Array<string> = $state([])
 	let rows: item[] = $state(data.items)
 	let inventoryList: Transaction[] = $state(data.inventoryList)
@@ -252,7 +196,7 @@
 		</div>
 		
 		
-		<button id="submitBtn" class="button-normal" type="submit">Submit Sign-in</button>
+		<button id="submitBtn" class="button-normal">Submit Sign-in</button>
 		<button type="button" id="clearBtn" onmousedown="{() => {
 			setTimeout(reset, 10)
 			scannedItems.clear()
@@ -265,4 +209,3 @@
 	</form>
 </div>
 </dialog>
-

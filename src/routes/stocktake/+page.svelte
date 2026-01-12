@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	
-	
 	// Types
 	type Item = {
 		id: Number;
@@ -51,13 +48,6 @@
 	let selecteddept = $state(currentdept)
 	let counted = $state(0)
 	let results = $state("")
-	
-	// Fast typing detection for barcode scanner
-	let lastKeyTime = 0;
-	let keySequence = '';
-	let fastTypingTimeout: NodeJS.Timeout;
-	const FAST_TYPING_THRESHOLD = 100; // ms between keys to consider it "fast typing"
-	const MIN_SEQUENCE_LENGTH = 3; // minimum keys to trigger barcode mode
 
 	// Utility Functions
 
@@ -74,26 +64,10 @@
 		selecteditems = items
 		.filter((row: Item) => row.currentholder === Number(selecteddept))
 
-		// Reset all counters when department changes
-		accounted = 0;
-		counted = 0;
-		scannedItems.clear();
-
 		selecteditems.forEach((row: Item) => {
 			row.scanned = false
 		});
-	}
 
-	function validateCounters() {
-		// Ensure counters never exceed total items
-		if (accounted > selecteditems.length) {
-			console.warn(`Accounted (${accounted}) exceeds total items (${selecteditems.length}), resetting...`);
-			accounted = selecteditems.length;
-		}
-		if (counted > selecteditems.length) {
-			console.warn(`Counted (${counted}) exceeds total items (${selecteditems.length}), resetting...`);
-			counted = selecteditems.length;
-		}
 	}
 
 	function showStatus(message: string, isSuccess: boolean) {
@@ -123,11 +97,9 @@
 					(rowElem as HTMLElement).focus();
 				}
 				if (rowButton) {
-					(rowButton as HTMLInputElement).checked = true
+					rowButton.checked = true
 				}
-				// Remove duplicate counter increment
-				// counted += 1  // REMOVED - accounted already tracks this
-				validateCounters(); // Ensure counters stay within bounds
+				counted += 1
 			} else {
 				showStatus(`Item already scanned`, false);
 			}
@@ -155,56 +127,11 @@
 			scannerTimeout = setTimeout(handleBarcodeScan, SCANNER_DELAY)
 	}
 
-	onMount(async () => {
-		window.onbeforeunload = function (e) {
-			return "You have unsaved changes. Are you sure you want to leave?";
-		};
-	})
 
 
 	// Effects
 	$effect(() => {
 		results = JSON.stringify(selecteditems) 
-		validateCounters(); // Ensure counters stay within bounds
-	});
-	
-	// Add global keyboard listener for fast typing detection
-	$effect(() => {
-		const handleGlobalKeydown = (e: KeyboardEvent) => {
-			const currentTime = Date.now();
-			
-			// Detect fast typing (barcode scanner typically types very fast)
-			if (currentTime - lastKeyTime < FAST_TYPING_THRESHOLD) {
-				keySequence += e.key;
-				clearTimeout(fastTypingTimeout);
-				
-				// If we have a fast sequence, focus on barcode input
-				if (keySequence.length >= MIN_SEQUENCE_LENGTH) {
-					const barcodeInput = document.getElementById("barcodeInput") as HTMLInputElement;
-					if (barcodeInput && document.activeElement !== barcodeInput) {
-						e.preventDefault();
-						barcodeInput.focus();
-						showStatus('Fast typing detected - activated barcode mode', true);
-					}
-				}
-				
-				// Reset fast typing detection after delay
-				fastTypingTimeout = setTimeout(() => {
-					keySequence = '';
-				}, 500);
-			} else {
-				// Reset sequence if typing is slow
-				keySequence = '';
-			}
-			
-			lastKeyTime = currentTime;
-		};
-		
-		document.addEventListener('keydown', handleGlobalKeydown);
-		
-		return () => {
-			document.removeEventListener('keydown', handleGlobalKeydown);
-		};
 	});
 
 	// Initial population
@@ -219,7 +146,7 @@
 		<div bind:this={statusMessage}></div>
 	</div>
 	<input type="text" placeholder="Scan items here" 
-	autocomplete="off" class="text" id="barcodeInput" 
+	autocomplete="off" class="text" id="barcodeInput"
 	oninput={(e) => {receiveBarcode(e)}}>
 
 	<br />
@@ -274,4 +201,3 @@
 		<button  class="w-full">Submit</button>
 	</form>
 </div>
-

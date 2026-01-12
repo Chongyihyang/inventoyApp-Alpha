@@ -1,7 +1,5 @@
 <script lang="ts">
 	import Dropdown from "$lib/dropdown.svelte";
-	import { enhanceFormSubmission } from "$lib/client/network";
-	import { onMount } from 'svelte';
 	// Type declaration
 	type item = {
 		id: string,
@@ -39,59 +37,6 @@
 	let formElement: HTMLFormElement
 	let dialog: HTMLDialogElement // HTMLDialogElement
 	let { signOutModalOpen = $bindable(), data, form } = $props()
-	
-	// Initialize network resilience on mount
-	onMount(() => {
-		if (formElement) {
-			enhanceFormSubmission(formElement);
-		}
-		
-		// Add global keyboard listener for fast typing detection
-		const handleGlobalKeydown = (e: KeyboardEvent) => {
-			if (!signOutModalOpen) return;
-			
-			const currentTime = Date.now();
-			
-			// Detect fast typing (barcode scanner typically types very fast)
-			if (currentTime - lastKeyTime < FAST_TYPING_THRESHOLD) {
-				keySequence += e.key;
-				clearTimeout(fastTypingTimeout);
-				
-				// If we have a fast sequence, focus on barcode input
-				if (keySequence.length >= MIN_SEQUENCE_LENGTH) {
-					const barcodeInput = document.getElementById("barcodeInput") as HTMLInputElement;
-					if (barcodeInput && document.activeElement !== barcodeInput) {
-						e.preventDefault();
-						barcodeInput.focus();
-						showStatus('Fast typing detected - activated barcode mode', true);
-					}
-				}
-				
-				// Reset fast typing detection after delay
-				fastTypingTimeout = setTimeout(() => {
-					keySequence = '';
-				}, 500);
-			} else {
-				// Reset sequence if typing is slow
-				keySequence = '';
-			}
-			
-			lastKeyTime = currentTime;
-		};
-		
-		document.addEventListener('keydown', handleGlobalKeydown);
-		
-		return () => {
-			document.removeEventListener('keydown', handleGlobalKeydown);
-		};
-	});
-	
-	// Fast typing detection for barcode scanner
-	let lastKeyTime = 0;
-	let keySequence = '';
-	let fastTypingTimeout: NodeJS.Timeout;
-	const FAST_TYPING_THRESHOLD = 100; // ms between keys to consider it "fast typing"
-	const MIN_SEQUENCE_LENGTH = 3; // minimum keys to trigger barcode mode
 	let selectedDept: string = $state("")
 	let selectedName: string = $state("")
 	let itemList: Array<string> = $state([])
@@ -178,46 +123,17 @@
 
 	function receiveBarcode(e: Event) {
 		if (!(e.target as HTMLInputElement).value) return
-		
-		const input = e.target as HTMLInputElement;
-		const currentValue = input.value;
-		const currentTime = Date.now();
-		
-		// Detect fast typing (barcode scanner behavior)
-		if (currentTime - lastKeyTime < FAST_TYPING_THRESHOLD) {
-			keySequence += currentValue;
-			clearTimeout(fastTypingTimeout);
-			
-			// If we have a fast sequence, focus on barcode input
-			if (keySequence.length >= MIN_SEQUENCE_LENGTH) {
-				const barcodeInput = document.getElementById("barcodeInput") as HTMLInputElement;
-				if (barcodeInput && document.activeElement !== barcodeInput) {
-					barcodeInput.focus();
-					barcodeInput.value = keySequence;
-					showStatus('Fast typing detected - activated barcode mode', true);
-				}
-			}
-			
-			// Reset fast typing detection after delay
-			fastTypingTimeout = setTimeout(() => {
-				keySequence = '';
-			}, 500);
-		} else {
-			// Reset sequence if typing is slow
-			keySequence = '';
-		}
-		
-		lastKeyTime = currentTime;
 					
-		// Add to buffer and clear input (existing logic)
-		scannerBuffer += currentValue;
-		input.value = ''
+					// Add to buffer and clear input
+					scannerBuffer += (e.target as HTMLInputElement).value;
+					(e.target as HTMLInputElement).value = ''
 
-		// Reset timeout
-		clearTimeout(scannerTimeout);
-		
-		// Set timeout to detect end of scan
-		scannerTimeout = setTimeout(handleBarcodeScan, SCANNER_DELAY)
+					
+					// Reset timeout
+					clearTimeout(scannerTimeout)
+					
+					// Set timeout to detect end of scan
+					scannerTimeout = setTimeout(handleBarcodeScan, SCANNER_DELAY)
 	}
 
 	const reset = () => {
@@ -226,15 +142,15 @@
 		showStatus('Cleared all items', true)
 	}
 
-	const countries = data.users.map((x: any) => {return {display: x.username, value: x.id}})
+	const countries = data.users.map(x => {return {display: x.username, value: x.id}})
 
   	let selectedCountry = $state('')
 
 
-	function handleComboboxChange(event: any) {
+	function handleComboboxChange(event) {
     	console.log('Selected:', event.detail.value)
 		selectedName = event.detail.value
-   }
+  	}
 </script>
 
 <dialog
@@ -306,7 +222,8 @@
 				</div>
 			</div>
 		</div>
-	<div class="form-group w-full">
+		
+		<div class="form-group w-full">
 			<label for="HOTO">HOTO Option:</label>
 			<select class="text overflow-y-auto w-full" name="HOTO" id="HOTO">
 				<option value="none" selected>No HOTO</option>
@@ -315,7 +232,7 @@
 			</select>
 		</div>
 		
-		<button id="submitBtn" class="button-normal" type="submit">Submit Sign-Out</button>
+		<button id="submitBtn" class="button-normal">Submit Sign-Out</button>
 		<button type="button" id="clearBtn" onmousedown="{() => {
 			setTimeout(reset, 10)
 			scannedItems.clear()
