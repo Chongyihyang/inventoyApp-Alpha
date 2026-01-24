@@ -1,6 +1,7 @@
 <script lang="ts">
 	// done refactoring add logic
 	// init types
+	import Password from "$lib/password.svelte";
 
     type FormData = {
         error?: string
@@ -14,6 +15,7 @@
     } = $props()
 
     let dialog = $state<HTMLDialogElement>()
+	let password = $state("")
 	// Effect to handle modal open/close
 	$effect(() => {
 		if (!dialog) return
@@ -50,6 +52,17 @@
 			<input type="hidden" name="username" value={user.username}>
 			<h2 class="my-auto grid" id="itemname">New department name: </h2>
 			<input class="box" type="text" name="categoryname" autocomplete="off" required>
+			
+			<!-- Superadmin Password Section -->
+			<div class="col-span-3">
+				<h3 class="font-bold text-lg mb-2">Create Superadmin Account</h3>
+				<p class="text-sm text-gray-600 mb-4">A superadmin account will be created with username: [DEPARTMENTNAME]ADMIN</p>
+			</div>
+			
+			<Password {password}/> 
+			<h2 class="mr-2 my-auto" id="passwordretype">Password Retype:  <span class="required">*</span></h2>
+			<input  class="box" type="password" name="passwordretype" required> 
+			
 			<input type="submit" class="submit" name="" id="">
 			<button type="button" onmousedown={closeModal} class="col-span-3">close modal</button>
 		</div>

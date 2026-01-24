@@ -4,6 +4,9 @@ import { eq } from 'drizzle-orm';
 import { requireLogin } from '$lib';
 import { fail } from '@sveltejs/kit';
 import { department, toLog } from "$lib/shared.svelte"
+import { cache } from '$lib/server/cache';
+import { hash } from '@node-rs/argon2';
+import { generateUserId, validatePassword } from '$lib/utils';
 
  
 
@@ -64,6 +67,7 @@ export const actions = {
                         departmentname: categoryname
                     })
                     .where(eq(table.departmentTable.id, Number(id)))
+                cache.invalidateDepartments();
                 if (toLog.current.values == 1) {
                     await db.insert(table.logsTable).values({
                         time: Date.now(),
@@ -87,22 +91,60 @@ export const actions = {
             const userid = data.get('id_')?.toString()?.trim() ?? ''
             const username = data.get('username')?.toString()?.trim() ?? ''
             const categoryname = data.get('categoryname')?.toString()?.trim() ?? ''
+            const password = data.get('passwordhash')?.toString()?.trim() ?? ''
+            const passwordRetype = data.get('passwordretype')?.toString()?.trim() ?? ''
 
             validateDepartmentName(categoryname);
+            
+            // Validate password
+            if (!password || !passwordRetype) {
+                throw new Error("Password is required for superadmin account creation");
+            }
+            
+            if (password !== passwordRetype) {
+                throw new Error("Passwords do not match");
+            }
+            
+            if (!validatePassword(password)) {
+                throw new Error('Password does not meet complexity requirements');
+            }
 
-            await db.insert(table.departmentTable).values({
+            // Create department first
+            const [newDepartment] = await db.insert(table.departmentTable).values({
                 departmentname: categoryname
+            }).returning();
+            
+            // Hash password
+            const passwordHash = await hash(password, {
+                memoryCost: 19456,
+                timeCost: 2,
+                outputLen: 32,
+                parallelism: 1
             });
+            
+            // Create superadmin user
+            const superadminUsername = `${categoryname}ADMIN`;
+            const superadminUser = {
+                id: generateUserId(),
+                username: superadminUsername,
+                roleid: 1, // SUPERADMIN role
+                departmentid: newDepartment.id,
+                passwordHash
+            };
+            
+            await db.insert(table.usersTable).values(superadminUser);
+            
+            cache.invalidateDepartments();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),
-                    item: `${userid} / ${username} ADDED DEPARTMENT: ${categoryname}`
+                    item: `${userid} / ${username} ADDED DEPARTMENT: ${categoryname} with superadmin: ${superadminUsername}`
                 })
             }
             return { success: true };
 
         } catch (error) {
-            const message = error instanceof Error ? error.message : "Failed to create item";
+            const message = error instanceof Error ? error.message : "Failed to create department";
             return fail(422, {
                 error: message,
                 action: "add"
@@ -127,6 +169,7 @@ export const actions = {
             validateDeleteConfirmation(categoryname, confirmation);
             await db.delete(table.departmentTable)
                 .where(eq(table.departmentTable.id, Number(id)));
+            cache.invalidateDepartments();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),

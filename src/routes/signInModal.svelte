@@ -41,12 +41,17 @@
 	
 
 	function playAlertSound() {
-    	const sound = document.getElementById('alertSound') as HTMLVideoElement | null
-		if (sound) {
-			sound.play().catch((error: string) => {
-				console.error("Error playing sound:", error);
-			});
-		}
+		// Play Windows system error sound
+		const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+		audio.play().catch((error: string) => {
+			console.error("Error playing Windows error sound:", error);
+		});
 	}
 		
 	function init_(inventoryList: Transaction[], rows: item[]) {
@@ -150,7 +155,6 @@
 	}}}
 >
 <div class="internal">
-	<audio id="alertSound" src="src\routes\stocktake\sound.mp3" preload="auto" class="hidden"></audio>
 	<h1 class="title">Inventory Sign-In</h1>
 	{#if form?.error && form?.action == 'signin'}
 		<p class="error">{form.error}</p>

@@ -56,7 +56,7 @@
 			<input type="hidden" name="SN2" value="{currentSelectedList["SN2"]}">
 			<input type="hidden" name="itemname" value="{currentSelectedList["itemname"]}">
 			<div class="w-fit mx-auto">
-				<input class="box" type="text" name="confirmation" placeholder="Type in the item's name to delete" required>
+				<input class="box" type="text" name="confirmation" placeholder="Type in the item's name" required>
 				<input type="submit" value="✅" class="submit"/>
 				<button onmousedown="{closeModal}" type="button">❌</button>
 			</div>

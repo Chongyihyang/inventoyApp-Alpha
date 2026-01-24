@@ -5,6 +5,7 @@ import { requireLogin } from '$lib';
 import { fail } from '@sveltejs/kit';
 import { department, toLog } from "$lib/shared.svelte"
 import { getAllDepartments, getCategories, getItemsWithDepartments } from '$lib/utils.js';
+import { cache } from '$lib/server/cache';
 
 // Type definitions for better type safety
 // type Item = typeof table.itemsTable.$inferSelect;
@@ -131,7 +132,7 @@ export const actions = {
             } 
     
             const SN1 = columns[1] ? columns[1].trim() : '';
-            if (sn1Set.has(SN1)) {
+            if (SN1 != "" && sn1Set.has(SN1)) {
                 isValid = false;
                 messages.push("SN1 is not unique");
             } else if (SN1 != "") {
@@ -226,6 +227,7 @@ export const actions = {
                 await db.transaction(async (tx) => {
                     await tx.insert(table.itemsTable).values(params)
                 });
+                cache.invalidateItems();
                 if (toLog.current.values == 1) {
                     await db.insert(table.logsTable).values({
                         time: Date.now(),
@@ -260,9 +262,9 @@ export const actions = {
         try {
 
 
-            if (sn1Set.has(updateData.SN1) && updateData.SN1 != SN1_og) {
+            if (updateData.SN1 != "" && sn1Set.has(updateData.SN1) && updateData.SN1 != SN1_og) {
                 throw new Error("SN1 is not unique")
-            } else {
+            } else if (updateData.SN1 != "") {
                 sn1Set.add(updateData.SN1)
             }
     
@@ -282,6 +284,7 @@ export const actions = {
                 .update(table.itemsTable)
                 .set(updateData)
                 .where(eq(table.itemsTable.id, id));
+            cache.invalidateItems();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),
@@ -325,13 +328,13 @@ export const actions = {
                 originalholder = currentholder;
             }
 
-            if ((await getItemsWithDepartments()).filter(x => 
+            if (SN1 != "" && (await getItemsWithDepartments()).filter(x => 
                 x.SN1 == SN1)
                 .length != 0) {
                     throw new Error("SN1 is not unique")
             }
 
-            if ((await getItemsWithDepartments()).filter(x => 
+            if (SN2 != "" && (await getItemsWithDepartments()).filter(x => 
                 x.SN2 == SN2)
                 .length != 0) {
                     throw new Error("SN2 is not unique")
@@ -349,6 +352,7 @@ export const actions = {
             };
 
             await db.insert(table.itemsTable).values(item);
+            cache.invalidateItems();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),
@@ -384,6 +388,7 @@ export const actions = {
             validateDeleteConfirmation(itemname, confirmation);
             await db.delete(table.itemsTable)
                 .where(eq(table.itemsTable.id, Number(id)));
+            cache.invalidateItems();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),

@@ -36,6 +36,14 @@
 	}>();
 	const { items, currentdept } = data;
 	let user = $state(data.user)
+	
+	// Handle form submission response
+	$effect(() => {
+		if (form?.success) {
+			showStatus('Stocktake submitted successfully!', true);
+			clearCache();
+		}
+	});
 
 	// State
 	let scannerBuffer = ''
@@ -48,16 +56,104 @@
 	let selecteddept = $state(currentdept)
 	let counted = $state(0)
 	let results = $state("")
+	
+	// Cache key for localStorage
+	let CACHE_KEY = $derived(`stocktake_cache_${user}_${selecteddept}`)
 
 	// Utility Functions
 
-	function playAlertSound() {
-    	const sound = document.getElementById('alertSound') as HTMLVideoElement | null
-		if (sound) {
-			sound.play().catch((error: string) => {
-				console.error("Error playing sound:", error);
-			});
+	// Cache functions
+	function saveToCache() {
+		const cacheData = {
+			scannedItems: Array.from(scannedItems.entries()),
+			accounted,
+			counted,
+			selecteditems: selecteditems.map(item => ({
+				id: item.id,
+				scanned: item.scanned
+			}))
 		}
+		localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
+	}
+
+	function loadFromCache() {
+		try {
+			const cached = localStorage.getItem(CACHE_KEY)
+			if (cached) {
+				const cacheData = JSON.parse(cached)
+				
+				// Restore scannedItems
+				scannedItems.clear()
+				cacheData.scannedItems.forEach(([key, value]: [string, number]) => {
+					scannedItems.set(key, value)
+				})
+				
+				// Restore counters
+				accounted = cacheData.accounted || 0
+				counted = cacheData.counted || 0
+				
+				// Restore item states
+				if (cacheData.selecteditems) {
+					cacheData.selecteditems.forEach((cachedItem: {id: number, scanned: boolean}) => {
+						const item = selecteditems.find(si => si.id === cachedItem.id)
+						if (item) {
+							item.scanned = cachedItem.scanned
+						}
+					})
+				}
+				
+				// Update UI after loading cache
+				setTimeout(() => {
+					selecteditems.forEach((row: Item) => {
+						if (row.scanned) {
+							const rowElem = document.getElementById(String(row.id))
+							const rowButton = document.querySelector(`input[type="checkbox"][name="${String(row.id)}"]`)
+							if (rowElem) {
+								rowElem.className = 'text-green-400'
+							}
+							if (rowButton) {
+								(rowButton as HTMLInputElement).checked = true
+							}
+						}
+					})
+				}, 100)
+			}
+		} catch (error) {
+			console.error('Error loading cache:', error)
+		}
+	}
+
+	function clearCache() {
+		localStorage.removeItem(CACHE_KEY)
+		scannedItems.clear()
+		accounted = 0
+		counted = 0
+		selecteditems.forEach((row: Item) => {
+			row.scanned = false
+			const rowElem = document.getElementById(String(row.id))
+			const rowButton = document.querySelector(`input[type="checkbox"][name="${String(row.id)}"]`)
+			if (rowElem) {
+				rowElem.className = 'text-gray-400'
+			}
+			if (rowButton) {
+				(rowButton as HTMLInputElement).checked = false
+			}
+		})
+		showStatus('Form reset successfully', true)
+	}
+
+	function playAlertSound() {
+		// Play Windows system error sound
+		const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT' +
+			'RA0PqOPvsFkYBjiS2Oy9diMFl2+z5N17NwUOcLXx8bJmHgUuhM/w1YU+CR5itOzqnEoVCkqf4PK+bCEGLIbP8tiJOwgZZLvt559NEAxPqOPwtmMcBjiS1/LMeS0GI3fH8N+RQAoUXrTp66hVFApGnt/yvmwhBi6Gy/DaizsIGGS57OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+		audio.play().catch((error: string) => {
+			console.error("Error playing Windows error sound:", error);
+		});
 	}
 
 	function filterSelectedItems() {
@@ -97,9 +193,10 @@
 					(rowElem as HTMLElement).focus();
 				}
 				if (rowButton) {
-					rowButton.checked = true
+					(rowButton as HTMLInputElement).checked = true
 				}
 				counted += 1
+				saveToCache()
 			} else {
 				showStatus(`Item already scanned`, false);
 			}
@@ -136,6 +233,11 @@
 
 	// Initial population
 	filterSelectedItems();
+	
+	// Load cached state after filtering items
+	setTimeout(() => {
+		loadFromCache()
+	}, 100)
 	</script>
 
 <div class="form-group mx-auto max-h-[50vh] w-[90%] mt-3" id="main">
@@ -152,7 +254,6 @@
 	<br />
 	<br />
 	<div class="mx-auto max-h-[50vh] w-full overflow-y-auto mb-3">
-		<audio id="alertSound" src="src\routes\stocktake\sound.mp3" preload="auto" class="hidden"></audio>
 		<table class="m-0 mx-auto w-full">
 			<thead>
 				<tr>
@@ -176,7 +277,7 @@
 								const rowElem = document.getElementById(String(row.id))
 								const rowButton = document.querySelector(`input[type="checkbox"][name="${String(row.id)}"]`)
 								if (rowElem && rowButton) {
-									if (!rowButton.checked) {
+									if (!(rowButton as HTMLInputElement).checked) {
 										accounted -= 1
 										rowElem.classList.remove("text-green-400");
 										rowElem.className = 'text-gray-400'
@@ -187,6 +288,7 @@
 										rowElem.className = 'text-green-400'
 										row.scanned = true
 									}
+									saveToCache()
 								}
 							}}">
 						</td>
@@ -198,6 +300,9 @@
 	<form action="?/submit" method="POST">
 		<input type="hidden" bind:value={results} name="items">
 		<input type="hidden" name="user" bind:value={user}>
-		<button  class="w-full">Submit</button>
+		<div class="flex gap-2">
+			<button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white">Submit</button>
+			<button type="button" onclick={clearCache} class="flex-1 bg-red-600 hover:bg-red-700 text-white">Reset Form</button>
+		</div>
 	</form>
 </div>

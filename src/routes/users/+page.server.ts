@@ -6,6 +6,7 @@ import { fail } from '@sveltejs/kit';
 import { hash } from '@node-rs/argon2';
 import { generateUserId, validatePassword, validateUsername } from '$lib/utils';
 import { toLog } from "$lib/shared.svelte";
+import { cache } from '$lib/server/cache';
 
 // Type definitions for better type safety
 type UserInsert = typeof table.usersTable.$inferInsert;
@@ -126,6 +127,7 @@ export const actions = {
                 .set(updateData)
                 .where(eq(table.usersTable.id, id));
 
+            cache.invalidateUsers();
             return { success: true };
         } catch (error) {
             updateData["id"] = id
@@ -200,6 +202,7 @@ export const actions = {
             
 
             await db.insert(table.usersTable).values(user)
+            cache.invalidateUsers();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),
@@ -234,6 +237,7 @@ export const actions = {
 
             await db.delete(table.usersTable)
             .where(eq(table.usersTable.id, id));
+            cache.invalidateUsers();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),

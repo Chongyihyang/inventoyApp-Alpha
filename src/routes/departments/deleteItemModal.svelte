@@ -54,7 +54,7 @@
 			<input type="hidden" name="id" value={currentSelectedList.id}>
 			<input type="hidden" name="categoryname" value={currentSelectedList.departmentname}>
 			<div class="w-fit mx-auto">
-				<input class="box" type="text" name="confirmation" placeholder="Type in the item's name to delete" required>
+				<input class="box" type="text" name="confirmation" placeholder="Type in department" required>
 				<input type="submit" value="✅" class="submit"/>
 				<button onmousedown="{closeModal}" type="button">❌</button>
 			</div>

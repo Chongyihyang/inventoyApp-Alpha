@@ -8,7 +8,7 @@
 
     /* navbar */
     nav {
-        @apply dark:bg-gray-800;
+        @apply bg-gray-800;
     }
 
     .dropdown{
@@ -27,24 +27,12 @@
         @apply block
     }
 
-    /* ul {
-        @apply dark:bg-gray-700 flex;
-    }
-
-    li {
-        @apply m-3 dark:bg-gray-700;
-    }
-
-    li>a {
-        @apply align-middle;
-    } */
-
     a:hover {
         @apply text-gray-500;
     }
 
     select {
-        @apply py-[3px] dark:bg-gray-800 border-0 rounded-2xl;
+        @apply py-[3px] bg-gray-800 border-0 rounded-2xl;
     }
 
     .signout {
@@ -138,11 +126,11 @@
     }
 
     .box {
-        @apply h-10 col-span-2 dark:bg-gray-800 rounded-2xl;
+        @apply h-10 col-span-2 bg-gray-800 rounded-2xl;
     }
 
     .submit {
-        @apply font-bold col-span-3 dark:bg-gray-500 rounded-2xl p-3;
+        @apply font-bold col-span-3 bg-gray-500 rounded-2xl p-3;
     }
 
     .submit:hover {

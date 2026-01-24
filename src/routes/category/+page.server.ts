@@ -5,6 +5,7 @@ import { requireLogin } from '$lib';
 import { fail } from '@sveltejs/kit';
 import { department, toLog } from "$lib/shared.svelte"
 import { getItemsWithDepartments } from '$lib/utils.js';
+import { cache } from '$lib/server/cache';
 
 // Type definitions for better type safety
 // type Item = typeof table.itemsTable.$inferSelect;
@@ -85,7 +86,7 @@ export const actions = {
                         categoryname
                     })
                     .where(eq(table.categoriestable.id, Number(id)))
-                
+                cache.invalidateItems();
                 if (toLog.current.values == 1) {
                     await db.insert(table.logsTable).values({
                         time: Date.now(),
@@ -115,6 +116,7 @@ export const actions = {
             await db.insert(table.categoriestable).values({
                 categoryname
             });
+            cache.invalidateItems();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),
@@ -149,6 +151,7 @@ export const actions = {
             validateDeleteConfirmation(categoryname, confirmation);
             await db.delete(table.categoriestable)
                 .where(eq(table.categoriestable.id, Number(id)));
+            cache.invalidateItems();
             if (toLog.current.values == 1) {
                 await db.insert(table.logsTable).values({
                     time: Date.now(),

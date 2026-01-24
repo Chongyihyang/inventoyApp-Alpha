@@ -55,5 +55,8 @@ export const actions = {
             items,
             time: Date.now()
         })
+        
+        // Return success response to trigger form reset
+        return { success: true }
     }
 };
